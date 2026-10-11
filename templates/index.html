@@ -1,1 +1,37 @@
-Temporary file.
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <div class="eyebrow">FRIENDS' NUMBER CHALLENGE</div>
+  <h1>Pick smart.<br><span>Be the lowest unique.</span></h1>
+  <p>Choose one number from 1 to 1,000. The lowest number picked by exactly one approved demo entry wins the demo round.</p>
+  <div class="stats">
+    <div><small>Planned entry</small><strong>{{ price }} ETB</strong></div>
+    <div><small>Number range</small><strong>1–1,000</strong></div>
+    <div><small>Pending reviews</small><strong>{{ pending }}</strong></div>
+  </div>
+  <div class="warning"><strong>DEMO MODE</strong> — payment details are not connected. Do not send money. Uploads are for testing the review flow only.</div>
+</section>
+<section class="panel">
+  <h2>Submit a demo entry</h2>
+  <p class="muted">Select a payment label, enter a test transaction reference, and upload a sample screenshot. This does not process a payment.</p>
+  <form action="{{ url_for('submit') }}" method="post" enctype="multipart/form-data">
+    <label>Your display name<input name="player_name" maxlength="80" required placeholder="e.g. Hamza"></label>
+    <label>Telegram username (optional)<input name="telegram_username" maxlength="80" placeholder="@username"></label>
+    <label>Choose a number<input name="number" type="number" min="1" max="1000" required placeholder="1–1000"></label>
+    <label>Payment method (demo label)
+      <select name="payment_method" required><option value="">Choose method</option><option>Telebirr</option><option>CBE transfer</option></select>
+    </label>
+    <label>Test transaction reference<input name="transaction_ref" maxlength="100" required placeholder="Use a unique TEST reference"></label>
+    <label>Screenshot evidence<input name="screenshot" type="file" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp" required></label>
+    <button class="primary" type="submit">Submit for admin review</button>
+  </form>
+</section>
+<section class="panel">
+  <div class="section-head"><h2>Recent submissions</h2><a href="{{ url_for('results') }}">Demo results →</a></div>
+  {% if recent %}
+  <div class="table-scroll"><table><thead><tr><th>Code</th><th>Player</th><th>Number</th><th>Status</th></tr></thead><tbody>
+  {% for r in recent %}<tr><td>{{ r.code }}</td><td>{{ r.player_name }}</td><td>{{ r.number }}</td><td><span class="pill {{ r.status }}">{{ r.status }}</span></td></tr>{% endfor %}
+  </tbody></table></div>
+  {% else %}<p class="muted">No submissions yet. Try a demo entry.</p>{% endif %}
+</section>
+{% endblock %}
