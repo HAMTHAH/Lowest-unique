@@ -19,7 +19,7 @@ from flask import (
     abort,
     send_from_directory,
     jsonify,
-    RequestEntityTooLarge,
+    from werkzeug.exceptions import RequestEntityTooLarge,
 )
 from werkzeug.utils import secure_filename
 
