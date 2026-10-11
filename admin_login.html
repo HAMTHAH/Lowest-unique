@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="panel narrow">
+<h1>Admin sign in</h1>
+<p class="muted">Private review panel. Configure ADMIN_PASSWORD before sharing this demo.</p>
+<form method="post">
+<label>Admin password<input type="password" name="password" required autocomplete="current-password"></label>
+<button class="primary" type="submit">Sign in</button>
+</form>
+</section>
+{% endblock %}

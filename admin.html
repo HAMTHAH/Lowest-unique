@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="section-head"><div><div class="eyebrow">PRIVATE CONTROL PANEL</div><h1>Entry review</h1></div><a href="{{ url_for('admin_logout') }}">Sign out</a></div>
+<div class="warning"><strong>DEMO ONLY.</strong> Approve/reject updates a demo record only; it is not proof of payment. Real-money activation is disabled.</div>
+{% for e in entries %}
+<section class="panel entry-card">
+  <div class="section-head"><div><span class="pill {{ e.status }}">{{ e.status }}</span><h2>{{ e.player_name }} — #{{ e.number }}</h2><small class="muted">{{ e.code }} · {{ e.payment_method }} · {{ e.created_at }}</small></div></div>
+  <p><strong>Telegram:</strong> {{ '@' + e.telegram_username if e.telegram_username else 'Not provided' }}</p>
+  <p><strong>Transaction ref:</strong> <code>{{ e.transaction_ref }}</code></p>
+  <p><a target="_blank" rel="noopener" href="{{ url_for('proof', filename=e.screenshot) }}">Open screenshot evidence</a></p>
+  {% if e.admin_note %}<p><strong>Admin note:</strong> {{ e.admin_note }}</p>{% endif %}
+  {% if e.status == 'pending' %}
+  <form class="review-form" action="{{ url_for('review', entry_id=e.id) }}" method="post">
+    <input name="note" placeholder="Optional note (e.g. screenshot reviewed)" maxlength="250">
+    <button name="action" value="approve" class="primary">Approve demo</button>
+    <button name="action" value="reject" class="danger">Reject</button>
+  </form>
+  {% endif %}
+</section>
+{% else %}
+<section class="panel"><p class="muted">No entries submitted yet.</p></section>
+{% endfor %}
+{% endblock %}

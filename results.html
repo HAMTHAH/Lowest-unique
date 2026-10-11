@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+<div class="eyebrow">DEMO ROUND RESULTS</div>
+<h1>{% if winner is not none %}<span>Winner number: {{ winner }}</span>{% else %}<span>No unique winner yet</span>{% endif %}</h1>
+<p>Only entries marked approved in the demo admin panel count toward this result.</p>
+<div class="stats"><div><small>Approved demo entries</small><strong>{{ total }}</strong></div><div><small>Rule</small><strong>Lowest unique</strong></div></div>
+</section>
+<section class="panel"><h2>Number counts</h2>
+{% if rows %}<div class="table-scroll"><table><thead><tr><th>Number</th><th>Count</th><th>Result</th></tr></thead><tbody>
+{% for r in rows %}<tr><td>{{ r.number }}</td><td>{{ r.n }}</td><td>{% if r.n == 1 and winner == r.number %}<span class="pill approved">Lowest unique</span>{% elif r.n == 1 %}<span class="pill">Unique</span>{% else %}<span class="pill rejected">Repeated</span>{% endif %}</td></tr>{% endfor %}
+</tbody></table></div>{% else %}<p class="muted">No approved demo entries.</p>{% endif %}
+</section>
+{% endblock %}
