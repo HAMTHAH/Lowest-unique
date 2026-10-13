@@ -2,67 +2,65 @@
 {% block content %}
 
 <section class="hero">
-    <div class="eyebrow">ROUND RESULTS</div>
+  <div class="eyebrow">ROUND RESULTS</div>
 
-    <h1>
-        {% if winner is not none %}
-            <span>Winner number: {{ winner.number }}</span>
-        {% else %}
-            <span>No unique winner yet</span>
-        {% endif %}
-    </h1>
+  <h1>
+    {% if winner is not none %}
+      <span>Winner number: {{ winner }}</span>
+    {% else %}
+      <span>No unique winner yet</span>
+    {% endif %}
+  </h1>
 
-    <p>
-        Only entries manually approved by the administrator are counted.
-    </p>
+  <p>Only entries manually approved by the administrator are counted.</p>
 
-    <div class="stats">
-        <div>
-            <small>Approved entries</small>
-            <strong>{{ total }}</strong>
-        </div>
-        <div>
-            <small>Winning rule</small>
-            <strong>Lowest unique</strong>
-        </div>
+  <div class="stats">
+    <div>
+      <small>Approved entries</small>
+      <strong>{{ total }}</strong>
     </div>
+    <div>
+      <small>Winning rule</small>
+      <strong>Lowest unique</strong>
+    </div>
+  </div>
 </section>
 
 <section class="panel">
-    <h2>Number counts</h2>
+  <h2>Number counts</h2>
 
-    {% if rows %}
+  {% if rows %}
     <div class="table-scroll">
-        <table>
-            <thead>
-                <tr>
-                    <th>Number</th>
-                    <th>Count</th>
-                    <th>Result</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for r in rows %}
-                <tr>
-                    <td>{{ r.number }}</td>
-                    <td>{{ r.n }}</td>
-                    <td>
-                        {% if r.n == 1 and winner is not none and winner.number == r.number %}
-                            <span class="pill approved">Winner</span>
-                        {% elif r.n == 1 %}
-                            <span class="pill">Unique</span>
-                        {% else %}
-                            <span class="pill rejected">Repeated</span>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+      <table>
+        <thead>
+          <tr>
+            <th>Number</th>
+            <th>Count</th>
+            <th>Result</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in rows %}
+          <tr>
+            <td>{{ r.number }}</td>
+            <td>{{ r.n }}</td>
+            <td>
+              {% if r.n == 1 and winner is not none and winner == r.number %}
+                <span class="pill approved">Lowest unique winner</span>
+              {% elif r.n == 1 %}
+                <span class="pill">Unique</span>
+              {% else %}
+                <span class="pill rejected">Repeated</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
-    {% else %}
-        <p class="muted">No approved entries yet.</p>
-    {% endif %}
+  {% else %}
+    <p class="muted">No approved entries yet.</p>
+  {% endif %}
 </section>
 
 {% endblock %}
