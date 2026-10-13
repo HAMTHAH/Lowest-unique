@@ -15,61 +15,33 @@
 <section class="hero">
   <div class="eyebrow" data-i18n="eyebrow">FRIENDS' NUMBER CHALLENGE</div>
   <h1><span data-i18n="title1">Pick smart.</span><br><span data-i18n="title2">Be the lowest unique.</span></h1>
-  <p data-i18n="intro">Choose one number from 1 to 1,000. The lowest number picked by exactly one approved demo entry wins the demo round.</p>
+  <p data-i18n="intro">Choose one number from 1 to 1,000. The lowest number selected by exactly one approved entry wins the round.</p>
 
   <div class="stats">
-    <div><small data-i18n="planned">Planned entry</small><strong>{{ price }} ETB</strong></div>
+    <div><small data-i18n="planned">Entry fee</small><strong>{{ price }} ETB</strong></div>
     <div><small data-i18n="range">Number range</small><strong>1–1,000</strong></div>
     <div><small data-i18n="pending">Pending reviews</small><strong>{{ pending }}</strong></div>
   </div>
 
   <div class="warning">
-    <strong data-i18n="demo">DEMO MODE</strong> —
-    <span data-i18n="warning">Payment details are not connected. Do not send money. Uploads are for testing the review flow only.</span>
+    <strong data-i18n="payment_title">MANUAL TELEBIRR VERIFICATION</strong> —
+    <span data-i18n="warning">Submit your transaction reference and payment screenshot. Your entry remains pending until the administrator verifies your payment.</span>
+    <p>Telebirr number: {{ telebirr_number }}</p>
   </div>
 </section>
 
 <section class="panel">
-  <h2 data-i18n="submit_title">Submit a demo entry</h2>
-  <p class="muted" data-i18n="submit_intro">Select a payment label, enter a test transaction reference, and upload a sample screenshot. This does not process a payment.</p>
-
-  <form action="{{ url_for('submit') }}" method="post" enctype="multipart/form-data">
-    <label><span data-i18n="name">Your display name</span>
-      <input name="player_name" maxlength="80" required placeholder="e.g. Hamza" data-i18n-placeholder="name_ph">
-    </label>
-
-    <label><span data-i18n="telegram">Telegram username (optional)</span>
-      <input name="telegram_username" maxlength="80" placeholder="@username" data-i18n-placeholder="telegram_ph">
-    </label>
-
-    <label><span data-i18n="choose_number">Choose a number</span>
-      <input name="number" type="number" min="1" max="1000" required placeholder="1–1000">
-    </label>
-
-    <label><span data-i18n="method">Payment method (demo label)</span>
-      <select name="payment_method" required>
-        <option value="" data-i18n="choose_method">Choose method</option>
-        <option value="Telebirr">Telebirr</option>
-        <option value="CBE transfer">CBE transfer</option>
-      </select>
-    </label>
-
-    <label><span data-i18n="reference">Test transaction reference</span>
-      <input name="transaction_ref" maxlength="100" required placeholder="Use a unique TEST reference" data-i18n-placeholder="reference_ph">
-    </label>
-
-    <label><span data-i18n="screenshot">Screenshot evidence</span>
-      <input name="screenshot" type="file" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp" required>
-    </label>
-
-    <button class="primary" type="submit" data-i18n="submit_button">Submit for admin review</button>
-  </form>
+  <h2 data-i18n="submit_title">Enter the game</h2>
+  <p class="muted" data-i18n="submit_intro">Pay the entry fee through Telebirr, then submit your transaction reference and payment screenshot for manual verification.</p>
+  <p>
+    <a class="button primary" href="{{ url_for('enter_game') }}" data-i18n="enter_button">Enter the game</a>
+  </p>
 </section>
 
 <section class="panel">
   <div class="section-head">
     <h2 data-i18n="recent">Recent submissions</h2>
-    <a href="{{ url_for('results') }}" data-i18n="results">Demo results →</a>
+    <a href="{{ url_for('results') }}" data-i18n="results">Round results →</a>
   </div>
 
   {% if recent %}
@@ -94,7 +66,7 @@
     </table>
   </div>
   {% else %}
-  <p class="muted" data-i18n="none">No submissions yet. Try a demo entry.</p>
+  <p class="muted" data-i18n="none">No submissions yet.</p>
   {% endif %}
 </section>
 
@@ -102,79 +74,129 @@
 (function () {
   const words = {
     en: {
-      language_label:"🌐 Choose language", eyebrow:"FRIENDS' NUMBER CHALLENGE",
-      title1:"Pick smart.",title2:"Be the lowest unique.",
-      intro:"Choose one number from 1 to 1,000. The lowest number picked by exactly one approved demo entry wins the demo round.",
-      planned:"Planned entry",range:"Number range",pending:"Pending reviews",
-      demo:"DEMO MODE",warning:"Payment details are not connected. Do not send money. Uploads are for testing the review flow only.",
-      submit_title:"Submit a demo entry",submit_intro:"Select a payment label, enter a test transaction reference, and upload a sample screenshot. This does not process a payment.",
-      name:"Your display name",name_ph:"e.g. Hamza",telegram:"Telegram username (optional)",telegram_ph:"@username",
-      choose_number:"Choose a number",method:"Payment method (demo label)",choose_method:"Choose method",
-      reference:"Test transaction reference",reference_ph:"Use a unique TEST reference",
-      screenshot:"Screenshot evidence",submit_button:"Submit for admin review",
-      recent:"Recent submissions",results:"Demo results →",code:"Code",player:"Player",
-      number:"Number",status:"Status",none:"No submissions yet. Try a demo entry.",
-      Pending:"Pending",Approved:"Approved",Rejected:"Rejected"
+      language_label:"🌐 Choose language",
+      eyebrow:"FRIENDS' NUMBER CHALLENGE",
+      title1:"Pick smart.",
+      title2:"Be the lowest unique.",
+      intro:"Choose one number from 1 to 1,000. The lowest number selected by exactly one approved entry wins the round.",
+      planned:"Entry fee",
+      range:"Number range",
+      pending:"Pending reviews",
+      payment_title:"MANUAL TELEBIRR VERIFICATION",
+      warning:"Submit your transaction reference and payment screenshot. Your entry remains pending until the administrator verifies your payment.",
+      submit_title:"Enter the game",
+      submit_intro:"Pay the entry fee through Telebirr, then submit your transaction reference and payment screenshot for manual verification.",
+      enter_button:"Enter the game",
+      recent:"Recent submissions",
+      results:"Round results →",
+      code:"Code",
+      player:"Player",
+      number:"Number",
+      status:"Status",
+      none:"No submissions yet.",
+      Pending:"Pending",
+      Approved:"Approved",
+      Rejected:"Rejected"
     },
     am: {
-      language_label:"🌐 ቋንቋ ይምረጡ",eyebrow:"የጓደኞች የቁጥር ውድድር",
-      title1:"በጥበብ ይምረጡ።",title2:"ብቸኛው ዝቅተኛ ቁጥር ይሁኑ።",
-      intro:"ከ1 እስከ 1,000 አንድ ቁጥር ይምረጡ። በአንድ የጸደቀ የሙከራ ግቤት ብቻ የተመረጠው ዝቅተኛ ቁጥር ያሸንፋል።",
-      planned:"የታቀደ የመግቢያ ክፍያ",range:"የቁጥር ክልል",pending:"ግምገማ የሚጠብቁ",
-      demo:"የሙከራ ሁኔታ",warning:"የክፍያ መረጃ አልተገናኘም። ገንዘብ አይላኩ። ፋይሎች ለሙከራ ብቻ ናቸው።",
-      submit_title:"የሙከራ ግቤት ያስገቡ",submit_intro:"የክፍያ ምልክት ይምረጡ፣ የሙከራ ማጣቀሻ ቁጥር ያስገቡ እና የስክሪንሾት ምስል ይጫኑ። ይህ ክፍያ አያስኬድም።",
-      name:"የሚታይ ስምዎ",name_ph:"ለምሳሌ ሀምዛ",telegram:"የቴሌግራም ስም (አማራጭ)",telegram_ph:"@username",
-      choose_number:"ቁጥር ይምረጡ",method:"የክፍያ ዘዴ (የሙከራ ምልክት)",choose_method:"ዘዴ ይምረጡ",
-      reference:"የሙከራ ግብይት ማጣቀሻ",reference_ph:"ልዩ TEST ማጣቀሻ ይጠቀሙ",
-      screenshot:"የስክሪንሾት ማስረጃ",submit_button:"ለአስተዳዳሪ ግምገማ ያስገቡ",
-      recent:"የቅርብ ጊዜ ግቤቶች",results:"የሙከራ ውጤቶች →",code:"ኮድ",player:"ተጫዋች",
-      number:"ቁጥር",status:"ሁኔታ",none:"ገና ግቤት የለም። የሙከራ ግቤት ይሞክሩ።",
-      Pending:"በመጠባበቅ ላይ",Approved:"ጸድቋል",Rejected:"ውድቅ ተደርጓል"
+      language_label:"🌐 ቋንቋ ይምረጡ",
+      eyebrow:"የጓደኞች የቁጥር ውድድር",
+      title1:"በጥበብ ይምረጡ።",
+      title2:"ብቸኛው ዝቅተኛ ቁጥር ይሁኑ።",
+      intro:"ከ1 እስከ 1,000 አንድ ቁጥር ይምረጡ። በአንድ የጸደቀ ግቤት ብቻ የተመረጠው ዝቅተኛ ቁጥር ያሸንፋል።",
+      planned:"የመግቢያ ክፍያ",
+      range:"የቁጥር ክልል",
+      pending:"ግምገማ የሚጠብቁ",
+      payment_title:"በቴሌብር ክፍያ በእጅ ማረጋገጥ",
+      warning:"የግብይት ማጣቀሻ ቁጥርዎንና የክፍያ ስክሪንሾትዎን ያስገቡ። አስተዳዳሪው እስኪያረጋግጥ ድረስ ግቤትዎ በመጠባበቅ ላይ ይቆያል።",
+      submit_title:"ወደ ጨዋታው ይግቡ",
+      submit_intro:"የመግቢያ ክፍያውን በቴሌብር ይክፈሉ፣ ከዚያ የግብይት ማጣቀሻ ቁጥርና የክፍያ ስክሪንሾት ለማረጋገጫ ያስገቡ።",
+      enter_button:"ወደ ጨዋታው ይግቡ",
+      recent:"የቅርብ ጊዜ ግቤቶች",
+      results:"የዙር ውጤቶች →",
+      code:"ኮድ",
+      player:"ተጫዋች",
+      number:"ቁጥር",
+      status:"ሁኔታ",
+      none:"ገና ግቤት የለም።",
+      Pending:"በመጠባበቅ ላይ",
+      Approved:"ጸድቋል",
+      Rejected:"ውድቅ ተደርጓል"
     },
     ti: {
-      language_label:"🌐 ቋንቋ ምረጽ",eyebrow:"ናይ ኣዕሩኽ ቁጽሪ ውድድር",
-      title1:"ብጥበብ ምረጽ።",title2:"እቲ ዝተሓተ ፍሉይ ቁጽሪ ኩን።",
-      intro:"ካብ 1 ክሳብ 1,000 ሓደ ቁጽሪ ምረጽ። ብሓደ ጥራይ ዝጸደቐ ናይ ፈተነ ምዝገባ ዝተመርጸ ዝተሓተ ቁጽሪ ይዕወት።",
-      planned:"ዝተሓሰበ ክፍሊት",range:"ደረጃ ቁጽሪ",pending:"ገና ዘይተገምገሙ",
-      demo:"ናይ ፈተነ ሁኔታ",warning:"ናይ ክፍሊት ሓበሬታ ኣይተራኸበን። ገንዘብ ኣይትስደዱ። ፋይላት ንፈተነ ጥራይ እዮም።",
-      submit_title:"ናይ ፈተነ ምዝገባ ኣቕርብ",submit_intro:"ናይ ክፍሊት ምልክት ምረጽ፣ ናይ ፈተነ መወከሲ ቁጽሪ ኣእቱ። እዚ ክፍሊት ኣይፍጽምን።",
-      name:"ዝርአ ስምካ",name_ph:"ንኣብነት ሓምዛ",telegram:"ናይ ቴሌግራም ስም (ኣማራጺ)",telegram_ph:"@username",
-      choose_number:"ቁጽሪ ምረጽ",method:"ናይ ክፍሊት መገዲ (ፈተነ)",choose_method:"መገዲ ምረጽ",
-      reference:"ናይ ፈተነ መወከሲ",reference_ph:"ፍሉይ TEST መወከሲ ተጠቐም",
-      screenshot:"መርትዖ ስክሪንሾት",submit_button:"ንምምሕዳር ኣቕርብ",
-      recent:"ናይ ቀረባ ምዝገባታት",results:"ናይ ፈተነ ውጽኢት →",code:"ኮድ",player:"ተጻዋታይ",
-      number:"ቁጽሪ",status:"ኩነታት",none:"ገና ምዝገባ የለን።",
-      Pending:"ይጽበ",Approved:"ጸዲቑ",Rejected:"ተነጺጉ"
+      language_label:"🌐 ቋንቋ ምረጽ",
+      eyebrow:"ናይ ኣዕሩኽ ቁጽሪ ውድድር",
+      title1:"ብጥበብ ምረጽ።",
+      title2:"እቲ ዝተሓተ ፍሉይ ቁጽሪ ኩን።",
+      intro:"ካብ 1 ክሳብ 1,000 ሓደ ቁጽሪ ምረጽ። ብሓደ ጥራይ ዝጸደቐ ምዝገባ ዝተመርጸ ዝተሓተ ቁጽሪ ይዕወት።",
+      planned:"ክፍሊት መእተዊ",
+      range:"ደረጃ ቁጽሪ",
+      pending:"ገና ዘይተገምገሙ",
+      payment_title:"ብቴሌብር ክፍሊት ብኢድ ምርግጋጽ",
+      warning:"መወከሲ ቁጽሪ ግብይትካን ስክሪንሾት ክፍሊትካን ኣቕርብ። ኣማሓዳሪ ክሳብ ዘረጋግጾ ምዝገባኻ ኣብ ትጽቢት ይጸንሕ።",
+      submit_title:"ናብ ጸወታ እቶ",
+      submit_intro:"ክፍሊት መእተዊ ብቴሌብር ክፈል፣ ድሕሪኡ መወከሲ ግብይትን ስክሪንሾት ክፍሊትን ንምርግጋጽ ኣቕርብ።",
+      enter_button:"ናብ ጸወታ እቶ",
+      recent:"ናይ ቀረባ ምዝገባታት",
+      results:"ውጽኢት ዙር →",
+      code:"ኮድ",
+      player:"ተጻዋታይ",
+      number:"ቁጽሪ",
+      status:"ኩነታት",
+      none:"ገና ምዝገባ የለን።",
+      Pending:"ይጽበ",
+      Approved:"ጸዲቑ",
+      Rejected:"ተነጺጉ"
     },
     om: {
-      language_label:"🌐 Afaan filadhu",eyebrow:"DORGOMMII LAKKOOFSAA HIRIYYOOTAA",
-      title1:"Of eeggannoodhaan filadhu.",title2:"Lakkoofsa gadi aanaa kophaa ta'e filadhu.",
-      intro:"Lakkoofsa 1 hanga 1,000 keessaa tokko filadhu. Lakkoofsi gadi aanaan galmee yaalii mirkanaa'e tokko qofaan filatame ni injifata.",
-      planned:"Gatii galmee karoorfame",range:"Daangaa lakkoofsaa",pending:"Mirkaneessa eeggachaa jiru",
-      demo:"HAALA YAALII",warning:"Odeeffannoon kaffaltii hin walqabsiifamne. Maallaqa hin ergin. Faayiloonni olkaa'aman yaalii qofaaf.",
-      submit_title:"Galmee yaalii galchi",submit_intro:"Mala kaffaltii filadhu, lakkoofsa wabii yaalii galchi, suuraa ragaa olkaa'i. Kun kaffaltii hin raawwatu.",
-      name:"Maqaa mul'atu kee",name_ph:"Fakkeenyaaf Hamza",telegram:"Maqaa Telegram (dirqama miti)",telegram_ph:"@username",
-      choose_number:"Lakkoofsa filadhu",method:"Mala kaffaltii (yaalii)",choose_method:"Mala filadhu",
-      reference:"Lakkoofsa wabii yaalii",reference_ph:"Wabii TEST adda ta'e fayyadami",
-      screenshot:"Ragaa suuraa iskiriinii",submit_button:"Mirkaneessa bulchaaf ergi",
-      recent:"Galmeewwan dhiheenya kanaa",results:"Bu'aa yaalii →",code:"Koodii",player:"Taphataa",
-      number:"Lakkoofsa",status:"Haala",none:"Ammaaf galmeen hin jiru. Galmee yaalii tokko yaali.",
-      Pending:"Eeggachaa jira",Approved:"Mirkanaa'e",Rejected:"Didame"
+      language_label:"🌐 Afaan filadhu",
+      eyebrow:"DORGOMMII LAKKOOFSAA HIRIYYOOTAA",
+      title1:"Of eeggannoodhaan filadhu.",
+      title2:"Lakkoofsa gadi aanaa kophaa ta'e filadhu.",
+      intro:"Lakkoofsa 1 hanga 1,000 keessaa tokko filadhu. Lakkoofsi gadi aanaan galmee mirkanaa'e tokko qofaan filatame ni injifata.",
+      planned:"Gatii galmee",
+      range:"Daangaa lakkoofsaa",
+      pending:"Mirkaneessa eeggachaa jiru",
+      payment_title:"MIRKANEESSA KAFFALTII TELEBIRR HARKAAN",
+      warning:"Lakkoofsa wabii kaffaltii fi suuraa kaffaltii olkaa'i. Bulchaan hanga mirkaneessutti galmeen kee eeggataa ta'a.",
+      submit_title:"Tapha seeni",
+      submit_intro:"Kaffaltii galmee Telebirr'n kaffali, achiis lakkoofsa wabii fi suuraa kaffaltii mirkaneessaaf galchi.",
+      enter_button:"Tapha seeni",
+      recent:"Galmeewwan dhiheenya kanaa",
+      results:"Bu'aa marsaa →",
+      code:"Koodii",
+      player:"Taphataa",
+      number:"Lakkoofsa",
+      status:"Haala",
+      none:"Ammaaf galmeen hin jiru.",
+      Pending:"Eeggachaa jira",
+      Approved:"Mirkanaa'e",
+      Rejected:"Didame"
     },
     so: {
-      language_label:"🌐 Dooro luqadda",eyebrow:"TARTANKA LAMBARKA SAAXIIBADA",
-      title1:"Si xikmad leh u dooro.",title2:"Noqo lambarka ugu yar ee keli ah.",
-      intro:"Dooro hal lambar oo u dhexeeya 1 iyo 1,000. Lambarka ugu yar ee hal gelitaan tijaabo oo la ansixiyey oo keliya doortay ayaa guuleysta.",
-      planned:"Lacagta gelitaanka la qorsheeyey",range:"Xadka lambarrada",pending:"Sugaya dib-u-eegis",
-      demo:"HABKA TIJAABADA",warning:"Macluumaadka lacag-bixinta lama xirin. Lacag ha dirin. Faylasha la geliyo waa tijaabo keliya.",
-      submit_title:"Gudbi gelitaan tijaabo ah",submit_intro:"Dooro habka lacag-bixinta, geli tixraac tijaabo ah, kuna soo geli sawir tusaale ah. Tani lacag ma bixinayso.",
-      name:"Magacaaga muuqda",name_ph:"Tusaale: Hamza",telegram:"Magaca Telegram (ikhtiyaari)",telegram_ph:"@username",
-      choose_number:"Dooro lambar",method:"Habka lacag-bixinta (tijaabo)",choose_method:"Dooro hab",
-      reference:"Tixraaca macaamilka tijaabada",reference_ph:"Isticmaal tixraac TEST oo gaar ah",
-      screenshot:"Sawirka caddaynta",submit_button:"U gudbi maamulka si loo eego",
-      recent:"Gelitaannadii ugu dambeeyey",results:"Natiijooyinka tijaabada →",code:"Koodh",player:"Ciyaaryahan",
-      number:"Lambar",status:"Xaalad",none:"Weli wax gelitaan ah ma jiraan. Isku day gelitaan tijaabo ah.",
-      Pending:"Sugaya",Approved:"La ansixiyey",Rejected:"La diiday"
+      language_label:"🌐 Dooro luqadda",
+      eyebrow:"TARTANKA LAMBARKA SAAXIIBADA",
+      title1:"Si xikmad leh u dooro.",
+      title2:"Noqo lambarka ugu yar ee keli ah.",
+      intro:"Dooro hal lambar oo u dhexeeya 1 iyo 1,000. Lambarka ugu yar ee hal gelitaan la ansixiyey oo keliya doortay ayaa guuleysta.",
+      planned:"Lacagta gelitaanka",
+      range:"Xadka lambarrada",
+      pending:"Sugaya dib-u-eegis",
+      payment_title:"XAQIIJINTA LACAG-BIXINTA TELEBIRR EE GACANTA",
+      warning:"Gudbi tixraaca macaamilka iyo sawirka lacag-bixinta. Gelitaankaagu wuxuu sugayaa ilaa maamulka xaqiijiyo lacagta.",
+      submit_title:"Geli ciyaarta",
+      submit_intro:"Ku bixi lacagta gelitaanka Telebirr, dabadeed gudbi tixraaca macaamilka iyo sawirka lacag-bixinta si gacanta loo xaqiijiyo.",
+      enter_button:"Geli ciyaarta",
+      recent:"Gelitaannadii ugu dambeeyey",
+      results:"Natiijooyinka wareegga →",
+      code:"Koodh",
+      player:"Ciyaaryahan",
+      number:"Lambar",
+      status:"Xaalad",
+      none:"Weli wax gelitaan ah ma jiraan.",
+      Pending:"Sugaya",
+      Approved:"La ansixiyey",
+      Rejected:"La diiday"
     }
   };
 
@@ -187,21 +209,30 @@
 
     document.querySelectorAll("[data-i18n]").forEach(function (el) {
       const key = el.dataset.i18n;
-      if (dictionary[key] !== undefined) el.textContent = dictionary[key];
+      if (dictionary[key] !== undefined) {
+        el.textContent = dictionary[key];
+      }
     });
 
     document.querySelectorAll("[data-i18n-placeholder]").forEach(function (el) {
       const key = el.dataset.i18nPlaceholder;
-      if (dictionary[key] !== undefined) el.placeholder = dictionary[key];
+      if (dictionary[key] !== undefined) {
+        el.placeholder = dictionary[key];
+      }
     });
 
     document.querySelectorAll("[data-status]").forEach(function (el) {
       const key = el.dataset.status;
-      if (dictionary[key] !== undefined) el.textContent = dictionary[key];
+      if (dictionary[key] !== undefined) {
+        el.textContent = dictionary[key];
+      }
     });
 
     selector.value = lang;
-    try { localStorage.setItem("lowestWinsLanguage", lang); } catch (e) {}
+
+    try {
+      localStorage.setItem("lowestWinsLanguage", lang);
+    } catch (e) {}
   }
 
   selector.addEventListener("change", function () {
@@ -209,7 +240,11 @@
   });
 
   let initial = "en";
-  try { initial = localStorage.getItem("lowestWinsLanguage") || "en"; } catch (e) {}
+
+  try {
+    initial = localStorage.getItem("lowestWinsLanguage") || "en";
+  } catch (e) {}
+
   setLanguage(words[initial] ? initial : "en");
 })();
 </script>
