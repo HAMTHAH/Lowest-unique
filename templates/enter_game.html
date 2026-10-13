@@ -1,1 +1,125 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lowest Wins — Enter Game</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #10131c;
+      color: #f5f5f5;
+      font-family: Arial, sans-serif;
+    }
+    .card {
+      max-width: 480px;
+      margin: 20px auto;
+      padding: 24px;
+      background: #1c2230;
+      border-radius: 16px;
+    }
+    h1 { text-align: center; }
+    .price {
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+      color: #8cf0b0;
+    }
+    label {
+      display: block;
+      margin-top: 16px;
+      margin-bottom: 6px;
+    }
+    input, select, button {
+      box-sizing: border-box;
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #454d60;
+      font-size: 16px;
+    }
+    input, select {
+      background: #111722;
+      color: white;
+    }
+    button {
+      margin-top: 22px;
+      background: #69e69a;
+      color: #102016;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .notice {
+      padding: 12px;
+      background: #30394b;
+      border-radius: 8px;
+      line-height: 1.5;
+    }
+    .muted { color: #c2c9d5; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>Lowest Wins</h1>
+    <p class="price">{{ price }} ETB</p>
+
+    <div class="notice">
+      <strong>Manual Telebirr verification</strong>
+      <p>Submit your transaction reference and payment screenshot.
+      Your entry remains pending until an administrator checks it.</p>
+      <p><strong>Telebirr number:</strong>
+        {% if telebirr_number %}
+          {{ telebirr_number }}
+        {% else %}
+          Payment details are not configured yet. Please contact the administrator.
+        {% endif %}
+      </p>
+    </div>
+
+    {% if not real_money_enabled %}
+      <p class="notice">
+        Demo mode is active. Real-money entry and paid-game participation
+        are disabled. Submissions are for testing only.
+      </p>
+    {% endif %}
+
+    <form action="/submit" method="POST" enctype="multipart/form-data">
+      <label for="player_name">Your name</label>
+      <input id="player_name" name="player_name"
+             maxlength="80" required>
+
+      <label for="telegram_username">Telegram username</label>
+      <input id="telegram_username" name="telegram_username"
+             placeholder="@username" maxlength="80" required>
+
+      <label for="number">Choose a number (1–1000)</label>
+      <input id="number" name="number" type="number"
+             min="1" max="1000" required>
+
+      <label for="payment_method">Payment method</label>
+      <select id="payment_method" name="payment_method" required>
+        <option value="Telebirr">Telebirr</option>
+      </select>
+
+      <label for="transaction_ref">Transaction reference</label>
+      <input id="transaction_ref" name="transaction_ref"
+             maxlength="120" required>
+
+      <label for="screenshot">Payment screenshot</label>
+      <input id="screenshot" name="screenshot" type="file"
+             accept=".png,.jpg,.jpeg,.webp" required>
+
+      <p class="muted">
+        A screenshot does not confirm payment. Never submit your
+        Telebirr PIN or password.
+      </p>
+
+      <button type="submit">Submit Demo Entry</button>
+    </form>
+  </main>
+</body>
+</html>
+
