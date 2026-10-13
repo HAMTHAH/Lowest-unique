@@ -58,73 +58,208 @@
       line-height: 1.5;
     }
     .muted { color: #c2c9d5; font-size: 14px; }
+    .language-label { margin-top: 0; }
+    .language-select { margin-bottom: 20px; }
   </style>
 </head>
 <body>
   <main class="card">
-    <h1>Lowest Wins</h1>
+    <label class="language-label" for="language" data-i18n="language">Choose language</label>
+    <select id="language" class="language-select">
+      <option value="en">English</option>
+      <option value="am">አማርኛ</option>
+      <option value="ti">ትግርኛ</option>
+      <option value="om">Afaan Oromoo</option>
+      <option value="so">Soomaali</option>
+    </select>
+
+    <h1 data-i18n="title">Lowest Wins</h1>
     <p class="price">{{ price }} ETB</p>
 
     <div class="notice">
-      <strong>Manual Telebirr Payment Verification</strong>
-      <p>Submit your transaction reference and payment screenshot.
-      Your entry will remain pending until the administrator
-      verifies your payment.</p>
-      <p><strong>Telebirr number:</strong>
+      <strong data-i18n="manual_title">Manual Telebirr Payment Verification</strong>
+      <p data-i18n="manual_text">Submit your transaction reference and payment screenshot. Your entry will remain pending until the administrator verifies your payment.</p>
+      <p>
+        <strong data-i18n="telebirr_label">Telebirr number:</strong>
         {% if telebirr_number %}
           {{ telebirr_number }}
         {% else %}
-          Payment details are not configured. Contact the administrator.
+          <span data-i18n="not_configured">Payment details are not configured. Contact the administrator.</span>
         {% endif %}
       </p>
     </div>
 
     {% if not real_money_enabled %}
-      <p class="notice">
-        The entry system is currently in demo mode. Submissions
-        are disabled until the administrator enables the system.
+      <p class="notice" data-i18n="demo_notice">
+        The entry system is currently in demo mode. Submissions are disabled until the administrator enables the system.
       </p>
     {% else %}
       <p class="notice">
-        Entry fee: {{ price }} ETB. Pay through Telebirr.
-        Your entry is not confirmed until your payment is verified.
+        <span data-i18n="entry_fee">Entry fee:</span> {{ price }} ETB.
+        <span data-i18n="pay_telebirr">Pay through Telebirr. Your entry is not confirmed until your payment is verified.</span>
       </p>
     {% endif %}
 
-    <form action="{{ url_for('submit') }}" method="POST"
-          enctype="multipart/form-data">
-      <label for="player_name">Your name</label>
-      <input id="player_name" name="player_name"
-             maxlength="80" required>
+    <form action="{{ url_for('submit') }}" method="POST" enctype="multipart/form-data">
+      <label for="player_name" data-i18n="name_label">Your name</label>
+      <input id="player_name" name="player_name" maxlength="80" required>
 
-      <label for="telegram_username">Telegram username</label>
+      <label for="telegram_username" data-i18n="username_label">Telegram username (optional)</label>
       <input id="telegram_username" name="telegram_username"
              placeholder="@username" maxlength="80">
 
-      <label for="number">Choose a number (1–1000)</label>
-      <input id="number" name="number" type="number"
-             min="1" max="1000" required>
+      <label for="number" data-i18n="number_label">Choose a number (1–1000)</label>
+      <input id="number" name="number" type="number" min="1" max="1000" required>
 
-      <label for="payment_method">Payment method</label>
+      <label for="payment_method" data-i18n="method_label">Payment method</label>
       <select id="payment_method" name="payment_method" required>
         <option value="Telebirr">Telebirr</option>
       </select>
 
-      <label for="transaction_ref">Transaction reference</label>
-      <input id="transaction_ref" name="transaction_ref"
-             maxlength="120" required>
+      <label for="transaction_ref" data-i18n="reference_label">Transaction reference</label>
+      <input id="transaction_ref" name="transaction_ref" maxlength="120" required>
 
-      <label for="screenshot">Payment screenshot</label>
+      <label for="screenshot" data-i18n="screenshot_label">Payment screenshot</label>
       <input id="screenshot" name="screenshot" type="file"
              accept=".png,.jpg,.jpeg,.webp" required>
 
-      <p class="muted">
-        A screenshot alone does not confirm payment.
-        Never submit your Telebirr PIN or password.
+      <p class="muted" data-i18n="security_note">
+        A screenshot alone does not confirm payment. Never submit your Telebirr PIN or password.
       </p>
 
-      <button type="submit">Submit Entry</button>
+      <button type="submit" data-i18n="submit_button">Submit Entry</button>
     </form>
   </main>
+
+  <script>
+    const translations = {
+      en: {
+        language:"Choose language",
+        title:"Lowest Wins",
+        manual_title:"Manual Telebirr Payment Verification",
+        manual_text:"Submit your transaction reference and payment screenshot. Your entry will remain pending until the administrator verifies your payment.",
+        telebirr_label:"Telebirr number:",
+        not_configured:"Payment details are not configured. Contact the administrator.",
+        demo_notice:"The entry system is currently in demo mode. Submissions are disabled until the administrator enables the system.",
+        entry_fee:"Entry fee:",
+        pay_telebirr:"Pay through Telebirr. Your entry is not confirmed until your payment is verified.",
+        name_label:"Your name",
+        username_label:"Telegram username (optional)",
+        number_label:"Choose a number (1–1000)",
+        method_label:"Payment method",
+        reference_label:"Transaction reference",
+        screenshot_label:"Payment screenshot",
+        security_note:"A screenshot alone does not confirm payment. Never submit your Telebirr PIN or password.",
+        submit_button:"Submit Entry"
+      },
+      am: {
+        language:"ቋንቋ ይምረጡ",
+        title:"Lowest Wins — ዝቅተኛው ያሸንፋል",
+        manual_title:"የቴሌብር ክፍያ በእጅ ማረጋገጫ",
+        manual_text:"የግብይት ማጣቀሻ ቁጥርዎንና የክፍያ ስክሪንሾትዎን ያስገቡ። አስተዳዳሪው ክፍያውን እስኪያረጋግጥ ድረስ ግቤትዎ በመጠባበቅ ላይ ይቆያል።",
+        telebirr_label:"የቴሌብር ቁጥር፦",
+        not_configured:"የክፍያ መረጃ አልተዘጋጀም። አስተዳዳሪውን ያነጋግሩ።",
+        demo_notice:"ስርዓቱ በሙከራ ሁኔታ ላይ ነው። አስተዳዳሪው እስኪያነቃው ድረስ ግቤቶች አይቀበሉም።",
+        entry_fee:"የመግቢያ ክፍያ፦",
+        pay_telebirr:"በቴሌብር ይክፈሉ። ክፍያዎ እስኪረጋገጥ ድረስ ግቤትዎ አይጸድቅም።",
+        name_label:"ሙሉ ስም",
+        username_label:"የቴሌግራም ስም (አማራጭ)",
+        number_label:"ቁጥር ይምረጡ (1–1000)",
+        method_label:"የክፍያ ዘዴ",
+        reference_label:"የግብይት ማጣቀሻ ቁጥር",
+        screenshot_label:"የክፍያ ስክሪንሾት",
+        security_note:"ስክሪንሾት ብቻውን ክፍያን አያረጋግጥም። የቴሌብር PIN ወይም የይለፍ ቃልዎን ፈጽሞ አያስገቡ።",
+        submit_button:"ግቤት አስገባ"
+      },
+      ti: {
+        language:"ቋንቋ ምረጽ",
+        title:"Lowest Wins — ዝቅተኛ ቁጽሪ ይዕወት",
+        manual_title:"ናይ ቴሌብር ክፍሊት ብኢድ ምርግጋጽ",
+        manual_text:"መወከሲ ቁጽሪ ግብይትካን ስክሪንሾት ክፍሊትካን ኣቕርብ። ኣማሓዳሪ ክሳብ ዘረጋግጾ ምዝገባኻ ኣብ ትጽቢት ይጸንሕ።",
+        telebirr_label:"ቁጽሪ ቴሌብር፦",
+        not_configured:"ዝርዝር ክፍሊት ኣይተዳለወን። ምስ ኣማሓዳሪ ተራኸብ።",
+        demo_notice:"እቲ ስርዓት ኣብ ሙከራ ኩነታት እዩ። ኣማሓዳሪ ክሳብ ዘንቅሖ ምዝገባ ኣይቅበልን።",
+        entry_fee:"ክፍሊት መእተዊ፦",
+        pay_telebirr:"ብቴሌብር ክፈል። ክፍሊትካ ክሳብ ዝረጋገጽ ምዝገባኻ ኣይጸድቕን።",
+        name_label:"ሽምካ",
+        username_label:"ሽም ቴሌግራም (ኣማራጺ)",
+        number_label:"ቁጽሪ ምረጽ (1–1000)",
+        method_label:"ኣገባብ ክፍሊት",
+        reference_label:"መወከሲ ቁጽሪ ግብይት",
+        screenshot_label:"ስክሪንሾት ክፍሊት",
+        security_note:"ስክሪንሾት ጥራይ ክፍሊት ኣየረጋግጽን። PIN ወይ ፓስዎርድ ቴሌብርካ ፈጺምካ ኣይተእቱ።",
+        submit_button:"ምዝገባ ኣቕርብ"
+      },
+      om: {
+        language:"Afaan filadhu",
+        title:"Lowest Wins — Gadi aanaan ni injifata",
+        manual_title:"Mirkaneessa kaffaltii Telebirr harkaan",
+        manual_text:"Lakkoofsa wabii kaffaltii fi suuraa kaffaltii galchi. Bulchaan kaffaltii kee hanga mirkaneessutti galmeen kee eeggataa ta'a.",
+        telebirr_label:"Lakkoofsa Telebirr:",
+        not_configured:"Odeeffannoon kaffaltii hin qophoofne. Bulchaa qunnami.",
+        demo_notice:"Sirni kun yeroo ammaa haala yaalii keessa jira. Bulchaan hanga banutti galmeen hin fudhatamu.",
+        entry_fee:"Gatii galmee:",
+        pay_telebirr:"Telebirr'n kaffali. Kaffaltiin kee hanga mirkanaa'utti galmeen kee hin mirkanoofne.",
+        name_label:"Maqaa kee",
+        username_label:"Maqaa fayyadamaa Telegram (dirqama miti)",
+        number_label:"Lakkoofsa filadhu (1–1000)",
+        method_label:"Mala kaffaltii",
+        reference_label:"Lakkoofsa wabii kaffaltii",
+        screenshot_label:"Suuraa kaffaltii",
+        security_note:"Suuraan qofti kaffaltii hin mirkaneessu. PIN ykn jecha iccitii Telebirr kee hin galchin.",
+        submit_button:"Galmee ergi"
+      },
+      so: {
+        language:"Dooro luqadda",
+        title:"Lowest Wins — Kan ugu yar ayaa guuleysta",
+        manual_title:"Xaqiijinta lacag-bixinta Telebirr ee gacanta",
+        manual_text:"Gudbi tixraaca macaamilka iyo sawirka lacag-bixinta. Gelitaankaagu wuxuu sugayaa ilaa maamulka xaqiijiyo lacagta.",
+        telebirr_label:"Lambarka Telebirr:",
+        not_configured:"Faahfaahinta lacag-bixinta lama diyaarin. La xiriir maamulka.",
+        demo_notice:"Nidaamku hadda wuxuu ku jiraa tijaabo. Gelitaannada waa la joojiyey ilaa maamulka hawlgeliyo.",
+        entry_fee:"Lacagta gelitaanka:",
+        pay_telebirr:"Ku bixi Telebirr. Gelitaankaaga lama xaqiijinayo ilaa lacag-bixinta la hubiyo.",
+        name_label:"Magacaaga",
+        username_label:"Magaca Telegram (ikhtiyaari)",
+        number_label:"Dooro lambar (1–1000)",
+        method_label:"Habka lacag-bixinta",
+        reference_label:"Tixraaca macaamilka",
+        screenshot_label:"Sawirka lacag-bixinta",
+        security_note:"Sawir keliya ma xaqiijiyo lacag-bixinta. Waligaa ha gelin PIN-kaaga Telebirr ama erayga sirta ah.",
+        submit_button:"Gudbi gelitaanka"
+      }
+    };
+
+    const languageSelect = document.getElementById("language");
+
+    function applyLanguage(lang) {
+      const dictionary = translations[lang] || translations.en;
+      document.documentElement.lang = lang;
+
+      document.querySelectorAll("[data-i18n]").forEach(function (element) {
+        const key = element.dataset.i18n;
+        if (dictionary[key] !== undefined) {
+          element.textContent = dictionary[key];
+        }
+      });
+
+      try {
+        localStorage.setItem("lowestWinsLanguage", lang);
+      } catch (error) {}
+    }
+
+    languageSelect.addEventListener("change", function () {
+      applyLanguage(languageSelect.value);
+    });
+
+    let savedLanguage = "en";
+    try {
+      savedLanguage = localStorage.getItem("lowestWinsLanguage") || "en";
+    } catch (error) {}
+
+    if (!translations[savedLanguage]) savedLanguage = "en";
+    languageSelect.value = savedLanguage;
+    applyLanguage(savedLanguage);
+  </script>
 </body>
-</html>
+  </html>
