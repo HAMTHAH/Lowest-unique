@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -67,26 +66,33 @@
     <p class="price">{{ price }} ETB</p>
 
     <div class="notice">
-      <strong>Manual Telebirr verification</strong>
+      <strong>Manual Telebirr Payment Verification</strong>
       <p>Submit your transaction reference and payment screenshot.
-      Your entry remains pending until an administrator checks it.</p>
+      Your entry will remain pending until the administrator
+      verifies your payment.</p>
       <p><strong>Telebirr number:</strong>
         {% if telebirr_number %}
           {{ telebirr_number }}
         {% else %}
-          Payment details are not configured yet. Please contact the administrator.
+          Payment details are not configured. Contact the administrator.
         {% endif %}
       </p>
     </div>
 
     {% if not real_money_enabled %}
       <p class="notice">
-        Real-money entries require manual Telebirr payment verification. Your entry remains pending until approved by the administrator.. Real-money entry and paid-game participation
-        are disabled. Submissions are for testing only.
+        The entry system is currently in demo mode. Submissions
+        are disabled until the administrator enables the system.
+      </p>
+    {% else %}
+      <p class="notice">
+        Entry fee: {{ price }} ETB. Pay through Telebirr.
+        Your entry is not confirmed until your payment is verified.
       </p>
     {% endif %}
 
-    <form action="/submit" method="POST" enctype="multipart/form-data">
+    <form action="{{ url_for('submit') }}" method="POST"
+          enctype="multipart/form-data">
       <label for="player_name">Your name</label>
       <input id="player_name" name="player_name"
              maxlength="80" required>
@@ -113,8 +119,8 @@
              accept=".png,.jpg,.jpeg,.webp" required>
 
       <p class="muted">
-        A screenshot does not confirm payment. Never submit your
-        Telebirr PIN or password.
+        A screenshot alone does not confirm payment.
+        Never submit your Telebirr PIN or password.
       </p>
 
       <button type="submit">Submit Entry</button>
@@ -122,4 +128,3 @@
   </main>
 </body>
 </html>
-
