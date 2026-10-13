@@ -29,7 +29,9 @@ from werkzeug.utils import secure_filename
 # ============================================================
 
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.environ.get("DB_PATH", os.path.join(APP_DIR, "demo.sqlite3"))
+DB_PATH = os.environ.get(
+    "DB_PATH", os.path.join(APP_DIR, "demo.sqlite3")
+)
 UPLOAD_DIR = os.path.join(APP_DIR, "uploads")
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -38,15 +40,18 @@ app = Flask(__name__)
 
 APP_SECRET = os.environ.get("APP_SECRET")
 if not APP_SECRET:
-    raise RuntimeError("Set APP_SECRET in Fade Host environment variables.")
+    raise RuntimeError("Set APP_SECRET in environment variables.")
 
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")
 if not ADMIN_PASSWORD:
-    raise RuntimeError("Set ADMIN_PASSWORD in Fade Host environment variables.")
+    raise RuntimeError("Set ADMIN_PASSWORD in environment variables.")
 
-# Add the BotFather token as BOT_TOKEN in Fade Host.
-# Never put the real token directly in this file or in public GitHub code.
 BOT_TOKEN = os.environ.get("BOT_TOKEN", "").strip()
+
+# Set this in your hosting environment, not in public source code.
+TELEBIRR_NUMBER = os.environ.get(
+    "TELEBIRR_NUMBER", ""
+).strip()
 
 app.secret_key = APP_SECRET
 app.config["MAX_CONTENT_LENGTH"] = 5 * 1024 * 1024
@@ -54,8 +59,9 @@ app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SECURE"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 
-# Demo-only settings. Real-money mode intentionally stays disabled.
+# TEST MODE: do not enable real-money entry processing here.
 REAL_MONEY_ENABLED = False
+
 ENTRY_PRICE_ETB = 25
 MIN_NUMBER = 1
 MAX_NUMBER = 1000
@@ -92,14 +98,17 @@ def init_db():
             )
         """)
 
-        # Keep compatibility with an older demo database.
         columns = {
             row["name"]
-            for row in conn.execute("PRAGMA table_info(entries)").fetchall()
+            for row in conn.execute(
+                "PRAGMA table_info(entries)"
+            ).fetchall()
         }
+
         if "telegram_user_id" not in columns:
             conn.execute(
-                "ALTER TABLE entries ADD COLUMN telegram_user_id TEXT DEFAULT ''"
+                "ALTER TABLE entries "
+                "ADD COLUMN telegram_user_id TEXT DEFAULT ''"
             )
 
         conn.execute("""
@@ -127,12 +136,13 @@ def admin_required(fn):
 def allowed_file(filename):
     return (
         "." in filename
-        and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+        and filename.rsplit(".", 1)[1].lower()
+        in ALLOWED_EXTENSIONS
     )
 
 
 def validate_telegram_init_data(init_data):
-    """Validate Telegram Mini App initData before trusting its user fields."""
+    """Validate Telegram Mini App initData before trusting its user."""
     if not BOT_TOKEN or not init_data:
         return None
 
@@ -143,7 +153,6 @@ def validate_telegram_init_data(init_data):
             strict_parsing=True,
         )
 
-        # Reject duplicate keys to avoid ambiguous validation.
         if len({key for key, _ in pairs}) != len(pairs):
             return None
 
@@ -154,7 +163,8 @@ def validate_telegram_init_data(init_data):
             return None
 
         data_check_string = "\n".join(
-            f"{key}={value}" for key, value in sorted(parsed.items())
+            f"{key}={value}"
+            for key, value in sorted(parsed.items())
         )
 
         secret_key = hmac.new(
@@ -169,7 +179,9 @@ def validate_telegram_init_data(init_data):
             hashlib.sha256,
         ).hexdigest()
 
-        if not hmac.compare_digest(calculated_hash, received_hash):
+        if not hmac.compare_digest(
+            calculated_hash, received_hash
+        ):
             return None
 
         auth_date = int(parsed.get("auth_date", "0"))
@@ -185,13 +197,18 @@ def validate_telegram_init_data(init_data):
             return None
 
         user = json.loads(user_data)
+
         if not isinstance(user, dict) or not user.get("id"):
             return None
 
         return {
             "id": str(user["id"]),
-            "first_name": str(user.get("first_name", ""))[:80],
-            "username": str(user.get("username", ""))[:80],
+            "first_name": str(
+                user.get("first_name", "")
+            )[:80],
+            "username": str(
+                user.get("username", "")
+            )[:80],
         }
 
     except (ValueError, TypeError, json.JSONDecodeError):
@@ -213,11 +230,15 @@ def home():
         """).fetchall()
 
         approved = conn.execute("""
-            SELECT COUNT(*) AS n FROM entries WHERE status = 'approved'
+            SELECT COUNT(*) AS n
+            FROM entries
+            WHERE status = 'approved'
         """).fetchone()["n"]
 
         pending = conn.execute("""
-            SELECT COUNT(*) AS n FROM entries WHERE status = 'pending'
+            SELECT COUNT(*) AS n
+            FROM entries
+            WHERE status = 'pending'
         """).fetchone()["n"]
 
     return render_template(
@@ -226,6 +247,20 @@ def home():
         approved=approved,
         pending=pending,
         price=ENTRY_PRICE_ETB,
+        real_money_enabled=REAL_MONEY_ENABLED,
+    )
+
+
+# ============================================================
+# ENTER GAME — TELEBIRR INSTRUCTIONS
+# ============================================================
+
+@app.route("/enter-game")
+def enter_game():
+    return render_template(
+        "enter_game.html",
+        price=ENTRY_PRICE_ETB,
+        telebirr_number=TELEBIRR_NUMBER,
         real_money_enabled=REAL_MONEY_ENABLED,
     )
 
@@ -252,6 +287,7 @@ def telegram_auth():
         }), 400
 
     user = validate_telegram_init_data(init_data)
+
     if not user:
         return jsonify({
             "ok": False,
@@ -263,15 +299,13 @@ def telegram_auth():
     session["telegram_username"] = user["username"]
     session["telegram_first_name"] = user["first_name"]
 
-    return jsonify({
-        "ok": True,
-        "user": user,
-    })
+    return jsonify({"ok": True, "user": user})
 
 
 @app.route("/api/telegram-status")
 def telegram_status():
     user_id = session.get("telegram_user_id")
+
     return jsonify({
         "authenticated": bool(user_id),
         "user": {
@@ -288,43 +322,70 @@ def telegram_status():
 
 @app.route("/submit", methods=["POST"])
 def submit():
+    # Do not accept entries as real-money entries in test mode.
     if REAL_MONEY_ENABLED:
         abort(503)
 
-    player_name = request.form.get("player_name", "").strip()[:80]
+    player_name = request.form.get(
+        "player_name", ""
+    ).strip()[:80]
+
     username = (
         request.form.get("telegram_username", "")
         .strip()
         .lstrip("@")[:80]
     )
+
     method = request.form.get("payment_method", "")
-    ref = request.form.get("transaction_ref", "").strip()[:100]
+    ref = request.form.get(
+        "transaction_ref", ""
+    ).strip()[:100]
+
     number_raw = request.form.get("number", "")
     proof = request.files.get("screenshot")
 
-    # The ID is accepted only from the verified Telegram session.
-    telegram_user_id = session.get("telegram_user_id", "")
+    telegram_user_id = session.get(
+        "telegram_user_id", ""
+    )
 
-    if not player_name or method not in {"Telebirr", "CBE transfer"} or not ref:
-        flash("Please complete all required fields.", "error")
-        return redirect(url_for("home"))
+    if (
+        not player_name
+        or method != "Telebirr"
+        or not ref
+    ):
+        flash(
+            "Please complete the required fields. "
+            "Telebirr is the only displayed payment method.",
+            "error",
+        )
+        return redirect(url_for("enter_game"))
 
     try:
         number = int(number_raw)
         if not MIN_NUMBER <= number <= MAX_NUMBER:
             raise ValueError
     except (ValueError, TypeError):
-        flash("Choose a whole number from 1 to 1,000.", "error")
-        return redirect(url_for("home"))
+        flash(
+            "Choose a whole number from 1 to 1,000.",
+            "error",
+        )
+        return redirect(url_for("enter_game"))
 
-    if not proof or not proof.filename or not allowed_file(proof.filename):
-        flash("Upload a PNG, JPG, JPEG, or WEBP screenshot.", "error")
-        return redirect(url_for("home"))
+    if (
+        not proof
+        or not proof.filename
+        or not allowed_file(proof.filename)
+    ):
+        flash(
+            "Upload a PNG, JPG, JPEG, or WEBP screenshot.",
+            "error",
+        )
+        return redirect(url_for("enter_game"))
 
     safe_name = secure_filename(proof.filename)
     if not safe_name:
         flash("Invalid screenshot filename.", "error")
-        return redirect(url_for("home"))
+        return redirect(url_for("enter_game"))
 
     stored_name = secrets.token_hex(12) + "_" + safe_name
     proof_path = os.path.join(UPLOAD_DIR, stored_name)
@@ -336,9 +397,9 @@ def submit():
         with db() as conn:
             conn.execute("""
                 INSERT INTO entries (
-                    code, player_name, telegram_username, telegram_user_id,
-                    number, payment_method, transaction_ref, screenshot,
-                    status, created_at
+                    code, player_name, telegram_username,
+                    telegram_user_id, number, payment_method,
+                    transaction_ref, screenshot, status, created_at
                 )
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)
             """, (
@@ -352,21 +413,23 @@ def submit():
                 stored_name,
                 datetime.now(timezone.utc).isoformat(),
             ))
+
     except sqlite3.IntegrityError:
         try:
             os.remove(proof_path)
         except OSError:
             pass
+
         flash(
-            "That transaction reference has already been submitted. "
-            "Duplicate references are blocked.",
+            "That transaction reference has already been submitted.",
             "error",
         )
-        return redirect(url_for("home"))
+        return redirect(url_for("enter_game"))
 
     flash(
-        f"Demo submission received: {code}. Status: pending admin review. "
-        "No real payment was processed.",
+        f"Test entry received: {code}. "
+        "Status: pending admin review. "
+        "No real payment was processed or verified.",
         "success",
     )
     return redirect(url_for("home"))
@@ -380,6 +443,7 @@ def submit():
 def admin_login():
     if request.method == "POST":
         password = request.form.get("password", "")
+
         if secrets.compare_digest(password, ADMIN_PASSWORD):
             session.clear()
             session["admin"] = True
@@ -430,7 +494,9 @@ def review(entry_id):
     if action not in {"approve", "reject"}:
         abort(400)
 
-    new_status = "approved" if action == "approve" else "rejected"
+    new_status = (
+        "approved" if action == "approve" else "rejected"
+    )
 
     with db() as conn:
         row = conn.execute(
@@ -442,12 +508,14 @@ def review(entry_id):
             abort(404)
 
         conn.execute(
-            "UPDATE entries SET status = ?, admin_note = ? WHERE id = ?",
+            "UPDATE entries SET status = ?, admin_note = ? "
+            "WHERE id = ?",
             (new_status, note, entry_id),
         )
 
     flash(
-        "Demo entry review updated. This does not confirm a real payment.",
+        "Test entry review updated. "
+        "This does not confirm a real payment.",
         "success",
     )
     return redirect(url_for("admin"))
@@ -456,11 +524,15 @@ def review(entry_id):
 @app.route("/admin/proof/<path:filename>")
 @admin_required
 def proof(filename):
-    return send_from_directory(UPLOAD_DIR, filename, as_attachment=False)
+    return send_from_directory(
+        UPLOAD_DIR,
+        filename,
+        as_attachment=False,
+    )
 
 
 # ============================================================
-# DEMO RESULTS: LOWEST UNIQUE APPROVED NUMBER WINS
+# DEMO RESULTS — LOWEST UNIQUE APPROVED NUMBER WINS
 # ============================================================
 
 @app.route("/results")
@@ -480,7 +552,9 @@ def results():
             WHERE status = 'approved'
         """).fetchone()["n"]
 
-    unique_numbers = [row["number"] for row in rows if row["n"] == 1]
+    unique_numbers = [
+        row["number"] for row in rows if row["n"] == 1
+    ]
     winner = min(unique_numbers) if unique_numbers else None
 
     return render_template(
@@ -500,13 +574,17 @@ def health():
     return jsonify({
         "ok": True,
         "real_money_enabled": REAL_MONEY_ENABLED,
+        "telebirr_configured": bool(TELEBIRR_NUMBER),
     })
 
 
 @app.errorhandler(RequestEntityTooLarge)
 def file_too_large(_error):
-    flash("Screenshot is too large. Maximum size is 5 MB.", "error")
-    return redirect(url_for("home"))
+    flash(
+        "Screenshot is too large. Maximum size is 5 MB.",
+        "error",
+    )
+    return redirect(url_for("enter_game"))
 
 
 if __name__ == "__main__":
