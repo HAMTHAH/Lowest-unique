@@ -18,7 +18,7 @@ ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "")
 TELEBIRR_NUMBER = os.environ.get("TELEBIRR_NUMBER", "").strip()
 
 ENTRY_PRICE_ETB = 25
-REAL_MONEY_ENABLED = False
+REAL_MONEY_ENABLED = true
 
 BASE_DIR = Path(__file__).resolve().parent
 DATABASE = Path(os.environ.get("DATABASE_PATH", str(BASE_DIR / "demo.sqlite3")))
